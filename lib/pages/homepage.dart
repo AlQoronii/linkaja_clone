@@ -468,21 +468,76 @@ class _HomePage extends State<Homepage> {
                 ),
               ),
             ),
-            ImageSlider(
-              pageController: _pageController,
-              totalImages: _totalImages,
-              currentPage: _currentPage,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index % _totalImages;
-                });
-
-                if (index == _totalImages) {
-                  Future.delayed(const Duration(milliseconds: 200), () {
-                    _pageController.jumpToPage(0);
-                  });
-                }
-              },
+            const SizedBox(height: 60),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Best Deals',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    'See All',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                ImageSlider(
+                  totalImages: 3,
+                  titles: [
+                    'Beli Voucher Games Harga Terjangkau Disini!',
+                    'Helloo',
+                    'Hai'
+                  ],
+                  subtitles: [
+                    'Bayarnya pakai LinkAja',
+                    'Beneran?',
+                    'LinkAja Disini :D'
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 40, 20, 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Latest Updates',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ImageSlider(
+                  totalImages: 3,
+                  titles: [
+                    'Beli Voucher Games Harga Terjangkau Disini!',
+                    'Helloo',
+                    'Hai'
+                  ],
+                  subtitles: [
+                    'Bayarnya pakai LinkAja',
+                    'Beneran?',
+                    'LinkAja Disini :D'
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -491,65 +546,136 @@ class _HomePage extends State<Homepage> {
   }
 }
 
-class ImageSlider extends StatelessWidget {
-  final PageController pageController;
+class ImageSlider extends StatefulWidget {
   final int totalImages;
-  final int currentPage;
-  final Function(int) onPageChanged;
+  final List<String> titles;
+  final List<String> subtitles;
 
   const ImageSlider({
     Key? key,
-    required this.pageController,
     required this.totalImages,
-    required this.currentPage,
-    required this.onPageChanged,
+    required this.titles,
+    required this.subtitles,
   }) : super(key: key);
+
+  @override
+  _ImageSliderState createState() => _ImageSliderState();
+}
+
+class _ImageSliderState extends State<ImageSlider> {
+  late PageController _pageController;
+  int _currentPage =
+      1; // Mulai di halaman 1 (bukan 0) untuk menambahkan looping
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Slider Image with Text
         Container(
-          height: 200,
-          margin: const EdgeInsets.all(15),
+          height: 250,
+          margin: const EdgeInsets.symmetric(horizontal: 15),
           child: PageView.builder(
-            controller: pageController,
-            onPageChanged: onPageChanged,
-            itemCount: totalImages + 1,
-            itemBuilder: (context, index) {
-              if (index == totalImages) {
-                return const SizedBox.shrink(); // Placeholder for looping
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+
+              // Looping ke gambar pertama (tanpa animasi)
+              if (index == widget.totalImages + 1) {
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  _pageController.jumpToPage(1);
+                });
               }
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
+
+              // Looping ke gambar terakhir (tanpa animasi)
+              if (index == 0) {
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  _pageController.jumpToPage(widget.totalImages);
+                });
+              }
+            },
+            itemCount: widget.totalImages + 2, // Tambahkan 2 untuk kloning
+            itemBuilder: (context, index) {
+              int realIndex = getRealIndex(index);
+
+              return Column(
+                children: [
+                  // Gambar slider
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child: Image.asset(
+                        'images/img${realIndex}.png', // Gambar dinamis
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  clipBehavior: Clip.hardEdge,
-                  child: Image.asset(
-                    'images/img${index + 1}.png',
-                    fit: BoxFit.cover,
+                  // Teks sesuai dengan gambar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Align(
+                      alignment:
+                          Alignment.centerLeft, // Posisi teks di kiri tengah
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Teks tetap rata kiri
+                        children: [
+                          Text(
+                            widget.titles[realIndex - 1], // Judul per gambar
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            widget.subtitles[
+                                realIndex - 1], // Deskripsi per gambar
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               );
             },
           ),
         ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            margin: const EdgeInsets.only(left: 20), // Jarak dari sisi kiri
-            child: Row(
-              children: List.generate(
-                totalImages,
-                (index) => _buildIndicator(index == currentPage),
-              ),
-            ),
-          ),
-        ),
+        // Indikator PageView
       ],
     );
+  }
+
+  // Fungsi untuk mendapatkan indeks asli gambar
+  int getRealIndex(int index) {
+    if (index == 0) {
+      return widget.totalImages; // Gambar terakhir di awal
+    } else if (index == widget.totalImages + 1) {
+      return 1; // Gambar pertama di akhir
+    }
+    return index;
   }
 }
 
