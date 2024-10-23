@@ -21,6 +21,7 @@ class AccountPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Nama dan Nomor Telepon
+                      SizedBox(height: 100),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -33,6 +33,7 @@ class _HomePage extends State<Homepage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   // Ikon pertama
+                  SizedBox(height: 50),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
